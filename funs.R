@@ -1,4 +1,5 @@
 # options(elsevier_api_key = getOption("ScopusKey"))
+# Add a comment on Jessica's machine.
 library(rscopus)
 
 if(FALSE) {
