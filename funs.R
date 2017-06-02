@@ -8,9 +8,8 @@ if(FALSE) {
 }
 
 getAuthorPubs =
-function(scopusID, ...)
+function(scopusID, docs = author_search(scopusID, ...), ...)
 {
-  docs = author_search(scopusID, ...)
   tmp = lapply(docs$entries, getDocCitations)
    # combining all of the separate data frames corresponding to each cited paper
    # into one big one.
@@ -54,7 +53,8 @@ getRefAuthors =
 function(ref)
 {
    aut = ref[["ref-info"]][["ref-authors"]]
-   if(length(aut)) {
+      # XXX 
+   ans = if(length(aut) && length(aut$author)) {
      if("@seq" %in% names(aut$author)) {
        tmp = as.data.frame(aut$author, stringsAsFactors = FALSE)
        names(tmp) = names(aut$author)
@@ -65,10 +65,25 @@ function(ref)
      data.frame(`@seq` = NA, `ce:initials` = NA, `ce:indexed-name` = NA, 
                     `ce:surname` = NA, check.names = FALSE)
 
+   if(!("ce:suffix" %in% names(ans)))
+       ans[["ce:suffix"]] = NA
+   if(!("ce:initials" %in% names(ans)))
+       ans[["ce:initials"]] = NA   
+   if(!("ce:given-name" %in% names(ans)))
+       ans[["ce:given-name"]] = NA   
+   
+   ans
 }
 
 getItemID =
-function(info)
+function(info, collapse = TRUE)
 {
-  structure(info[[2]], names = info[[1]])
+  if(length(names(info)) == 0) { 
+     ans = structure(sapply( info,  `[[`, 2), names = sapply(info, `[[`, 1))
+     if(collapse)
+        structure(paste(ans, collapse = ";"), names = paste(names(ans), collapse = ";"))         
+     else
+        ans
+  } else
+     structure(info[[2]], names = info[[1]])
 }
