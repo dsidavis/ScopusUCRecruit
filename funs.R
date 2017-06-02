@@ -1,6 +1,7 @@
-# options(elsevier_api_key = getOption("ScopusKey"))
-# Add a comment on Jessica's machine.
 library(rscopus)
+
+if(is.na(getOption("elsevier_api_key", NA)) && !is.null(getOption("ScopusKey")))
+     options(elsevier_api_key = getOption("ScopusKey"))
 
 if(FALSE) {
   info = lapply(authorIDs, getAuthorPubs)
@@ -8,15 +9,22 @@ if(FALSE) {
 }
 
 getAuthorPubs =
-function(scopusID, docs = author_search(scopusID, ...), ...)
+function(scopusID, docs = author_search(scopusID, ...),
+           citations = lapply(docs$entries, getDocCitations), ...)
 {
-  tmp = lapply(docs$entries, getDocCitations)
+  w = sapply(citations, is.null)
+  if(any(w)) {
+     warning("dropping citation info for ", sum(w), " papers")
+     citations = citations[ !w ]
+     docs$entries = docs$entries[!w]
+  }
+  
    # combining all of the separate data frames corresponding to each cited paper
-   # into one big one.
-  ans = do.call(rbind, tmp)
+   # into one big one.  
+  ans = do.call(rbind, citations)
    # Identifying each row with the actual author's paper id.
-  pid = sapply(docs$entries, function(r) entry[["dc:identifier"]])
-  ans$PaperID = rep(pid, sapply(tmp, nrow))
+  pid = sapply(docs$entries, function(r) r[["dc:identifier"]])
+  ans$PaperID = rep(pid, sapply(citations, nrow))
   ans
 }
 
@@ -25,7 +33,6 @@ getDocCitations =
 function(entry, id = entry[["dc:identifier"]],
          doc = abstract_retrieval(id, identifier = "scopus_id"))
 {
-
   refs = doc$content$`abstracts-retrieval-response`$item$bibrecord$tail$bibliography$reference
   ans = lapply(refs, processRef)
    # each element of ans should be a data.frame with 7 columns
