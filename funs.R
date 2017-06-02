@@ -55,13 +55,15 @@ function(ref)
 {
    aut = ref[["ref-info"]][["ref-authors"]]
    if(length(aut)) {
-     if(length(aut$author) > 1)
+     if("@seq" %in% names(aut$author)) {
+       tmp = as.data.frame(aut$author, stringsAsFactors = FALSE)
+       names(tmp) = names(aut$author)
+       tmp
+     } else 
        as.data.frame(do.call(rbind, aut$author), stringsAsFactors = FALSE)
-     else
-       as.data.frame(aut$author[[1]], stringsAsFactors = FALSE)
    } else
      data.frame(`@seq` = NA, `ce:initials` = NA, `ce:indexed-name` = NA, 
-                    `ce:surname` = NA)
+                    `ce:surname` = NA, check.names = FALSE)
 
 }
 
