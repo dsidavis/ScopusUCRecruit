@@ -15,6 +15,8 @@ function(scopusID, docs = author_search(scopusID, ...),
   w = sapply(citations, is.null)
   if(any(w)) {
      warning("dropping citation info for ", sum(w), " papers")
+#     
+# docs$entries[w]     
      citations = citations[ !w ]
      docs$entries = docs$entries[!w]
   }
