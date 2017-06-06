@@ -4,7 +4,7 @@ if(is.na(getOption("elsevier_api_key", NA)) && !is.null(getOption("ScopusKey")))
      options(elsevier_api_key = getOption("ScopusKey"))
 
 #Jessica's Scopus API key
-#options(elsevier_api_key="97c4a87e323f50e3be5d6415f3e7ac3b")
+#options(elsevier_api_key=
 
 
 if(FALSE) {
