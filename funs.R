@@ -3,12 +3,16 @@ library(rscopus)
 if(is.na(getOption("elsevier_api_key", NA)) && !is.null(getOption("ScopusKey")))
      options(elsevier_api_key = getOption("ScopusKey"))
 
-#Jessica's Scopus API key
-#options(elsevier_api_key=
-
-
 if(FALSE) {
   info = lapply(authorIDs, getAuthorPubs)
+  # The next version will continue on if one fails for any reason.
+#  info = lapply(authorIDs, function(id) try(getAuthorPubs(id)  ))
+  # check fails
+  # failed = sapply(info, is, "try-error")
+  # authorIDs[failed]
+  # explore with
+  #   options(error = recover)
+  #  getAuthorPubs(authorIDs[failed][1])
   names(info) = authorIDs
 }
 
@@ -31,6 +35,9 @@ function(scopusID, docs = author_search(scopusID, ...),
    # Identifying each row with the actual author's paper id.
   pid = sapply(docs$entries, function(r) r[["dc:identifier"]])
   ans$PaperID = rep(pid, sapply(citations, nrow))
+
+  ans$scopusID = scopusID # rep(scopusID, nrow(ans))
+  
   ans
 }
 
@@ -40,6 +47,9 @@ function(entry, id = entry[["dc:identifier"]],
          doc = abstract_retrieval(id, identifier = "scopus_id"))
 {
   refs = doc$content$`abstracts-retrieval-response`$item$bibrecord$tail$bibliography$reference
+  if("ref-info" %in% names(refs))
+     return(processRef(refs))
+  
   ans = lapply(refs, processRef)
    # each element of ans should be a data.frame with 7 columns
    # and a row for each of the authors
@@ -53,6 +63,10 @@ function(entry, id = entry[["dc:identifier"]],
 processRef =
 function(ref)
 {
+   if(is.null(ref[["ref-info"]]))
+      return(data.frame(`@seq` = NA, `ce:initials` = NA, `ce:indexed-name` = NA, 
+                    `ce:surname` = NA, check.names = FALSE))
+    
    id = getItemID( ref[["ref-info"]][["refd-itemidlist"]]$itemid )
    aut = getRefAuthors(ref)
    aut$id = id
@@ -102,7 +116,6 @@ function(info, collapse = TRUE)
 }
 
 
-
 #setwd("/Users/jessicagold/Desktop/GSR")
 #dir()
 #test <- read.csv("Test_auth_id.csv", header = TRUE, stringsAsFactors = FALSE)
@@ -112,7 +125,3 @@ function(info, collapse = TRUE)
 #library(data.table)
 #citation_table <- Map(as.data.frame, citation_info)
 #citation_table <- rbindlist(citation_table)
-
-
-
-
