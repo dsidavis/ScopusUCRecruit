@@ -1,3 +1,4 @@
+if(FALSE)
 d = data.frame(id = c("1234", "5678;10000", "no;yes", "123;456;789"),
                idType = c("SGR", "SGR;DOI", "DOI;SGR", "DOI;FOO;BAR"),
                stringsAsFactors = FALSE)
