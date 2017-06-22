@@ -3,6 +3,10 @@ library(rscopus)
 if(is.na(getOption("elsevier_api_key", NA)) && !is.null(getOption("ScopusKey")))
      options(elsevier_api_key = getOption("ScopusKey"))
 
+#Jessica's Scopus API key
+#options(elsevier_api_key=
+
+
 if(FALSE) {
   info = lapply(authorIDs, getAuthorPubs)
   names(info) = authorIDs
@@ -96,3 +100,19 @@ function(info, collapse = TRUE)
   } else
      structure(info[[2]], names = info[[1]])
 }
+
+
+
+#setwd("/Users/jessicagold/Desktop/GSR")
+#dir()
+#test <- read.csv("Test_auth_id.csv", header = TRUE, stringsAsFactors = FALSE)
+#citation_info = lapply(test$scopus_author_id, getAuthorPubs)
+#saveRDS(citation_info, file = "citation_info.rds")
+
+#library(data.table)
+#citation_table <- Map(as.data.frame, citation_info)
+#citation_table <- rbindlist(citation_table)
+
+
+
+
